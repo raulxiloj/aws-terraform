@@ -119,6 +119,7 @@ Si verificamos nuestro bucket:
     <p align="center">
         <img src="https://user-images.githubusercontent.com/30850990/159189069-66e598bf-8e1e-43e0-9096-6b8e79c6d5d3.png"/>
     </p>
+    
     - Subnets
 
 
