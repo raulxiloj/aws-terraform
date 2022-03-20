@@ -90,6 +90,38 @@ Si verificamos nuestro bucket:
 
 - Ahora todos los cambios se estaran guardando en s3.
 
+### Creacion de la infraestructura
+5. Descomentamos la llamada de los modulos en el archivo `provider.tf`. Iniciaremos con la creacion del modulo para nuestra VPC.
+    ```
+    module "vpc" {
+        source = "./modules/vpc"
+        vpc_cidr = "10.0.0.0/24"
+    }
+    ```
+    Debido a que utilizamos modulos, se tiene que volver a ejecutar el comando `init` para que se installen los requerimientos del mismo. Posteriormente ejecutamos el comando `apply`.
+    ```
+    terraform init
+    ```
+
+    <p align="center">
+        <img src="https://user-images.githubusercontent.com/30850990/159147817-057b5384-b69a-49ac-8bac-17816be6fb51.png"/>
+    </p>
+
+    ```
+    terraform apply
+    ```
+    <p align="center">
+        <img src="https://user-images.githubusercontent.com/30850990/159189407-77ddfd69-c85a-431c-8412-1ed13f1e3e9b.png"/>
+    </p>
+    
+
+    Verificamos en la interfaz de amazon y se pueden observar la vpc, subnets, internet gateway, NAT, entre otros que fueron creadas con exito.
+    <p align="center">
+        <img src="https://user-images.githubusercontent.com/30850990/159189069-66e598bf-8e1e-43e0-9096-6b8e79c6d5d3.png"/>
+    </p>
+    - Subnets
+
+
 <br/>
 
 ## Referencias
