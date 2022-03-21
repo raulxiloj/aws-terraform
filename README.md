@@ -30,10 +30,43 @@ Si se desea trabajar en equipo un proyecto de terraform, es recomendable crear u
 Al inicio en el archivo `provider.tf` que es el archivo principal se tiene comentado la parte de los modulos con el fin de primero configurar el `backend`.
 
 ```
-#module "vpc" {
-#    source = "./modules/vpc"
-#    vpc_cidr = "10.0.0.0/24"
-#}
+# module "vpc" {
+#     source = "./modules/vpc"
+#     vpc_cidr = "10.0.0.0/24"
+# }
+
+# module "sg" {
+#     source = "./modules/sg"
+#     vpc_id = module.vpc.vpc_id
+# }
+
+# data "aws_ami" "ubuntu" {
+#     most_recent = true
+
+#     filter {
+#         name = "name"
+#         values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
+#     }
+
+#     filter {
+#         name = "virtualization-type"
+#         values = ["hvm"]
+#     }
+
+#     filter {
+#         name = "architecture"
+#         values = ["x86_64"]
+#     }
+
+#     owners = ["099720109477"]
+# }
+
+# module "ec2" {
+#     source = "./modules/ec2"
+#     instance_ami = data.aws_ami.ubuntu.id
+#     subnet_id = module.vpc.public_subnets[0].id
+#     sg_ec2 = [module.sg.sg_server]
+# }
 ```
 - *Posteriormente lo descomentaremos.*
 
@@ -91,11 +124,44 @@ Si verificamos nuestro bucket:
 - Ahora todos los cambios se estaran guardando en s3.
 
 ### Creacion de la infraestructura
-5. Descomentamos la llamada de los modulos en el archivo `provider.tf`. Iniciaremos con la creacion del modulo para nuestra VPC.
+5. Descomentamos la llamada de los modulos en el archivo `provider.tf`.
     ```
     module "vpc" {
-        source = "./modules/vpc"
-        vpc_cidr = "10.0.0.0/24"
+    source = "./modules/vpc"
+    vpc_cidr = "10.0.0.0/24"
+    }
+
+    module "sg" {
+        source = "./modules/sg"
+        vpc_id = module.vpc.vpc_id
+    }
+
+    data "aws_ami" "ubuntu" {
+        most_recent = true
+
+        filter {
+            name = "name"
+            values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
+        }
+
+        filter {
+            name = "virtualization-type"
+            values = ["hvm"]
+        }
+
+        filter {
+            name = "architecture"
+            values = ["x86_64"]
+        }
+
+        owners = ["099720109477"]
+    }
+
+    module "ec2" {
+        source = "./modules/ec2"
+        instance_ami = data.aws_ami.ubuntu.id
+        subnet_id = module.vpc.public_subnets[0].id
+        sg_ec2 = [module.sg.sg_server]
     }
     ```
     Debido a que utilizamos modulos, se tiene que volver a ejecutar el comando `init` para que se installen los requerimientos del mismo. Posteriormente ejecutamos el comando `apply`.
@@ -111,21 +177,31 @@ Si verificamos nuestro bucket:
     terraform apply
     ```
     <p align="center">
-        <img src="https://user-images.githubusercontent.com/30850990/159189407-77ddfd69-c85a-431c-8412-1ed13f1e3e9b.png"/>
+        <img src="https://user-images.githubusercontent.com/30850990/159194198-2f68ad7a-31f5-4694-a154-ddb0092b120e.png"/>
     </p>
     
-
-    Verificamos en la interfaz de amazon y se pueden observar la vpc, subnets, internet gateway, NAT, entre otros que fueron creadas con exito.
+    Terraform crea los recursos segun los vaya necesitando. En este caso primero la vpc, luego las subnets, ig, etc.
+    <p align="center">
+        <img src="https://user-images.githubusercontent.com/30850990/159194333-7980713e-706b-4355-a430-3d7d49cd2b48.png"/>
+    </p>
+    
+    Verificamos en la interfaz de amazon y se pueden observar la vpc, subnets, internet gateway, NAT, sg, EC2, entre otros que fueron creadas con exito.
     <p align="center">
         <img src="https://user-images.githubusercontent.com/30850990/159189069-66e598bf-8e1e-43e0-9096-6b8e79c6d5d3.png"/>
     </p>
-    
-    - Subnets
 
-
+    Nuestra EC2 fue creada con exito en la public-subnet-1 como indicamos, por lo cual podemos acceder sin problema
+    <p align="center">
+        <img src="https://user-images.githubusercontent.com/30850990/159194449-ac011370-7834-4b78-902a-739119ce59cd.png"/>
+    </p>
+    <p align="center">
+        <img src="https://user-images.githubusercontent.com/30850990/159194542-8fe8d825-d887-42a4-a1c0-0fe142a89687.png"/>
+    </p>
 <br/>
 
 ## Referencias
+- https://registry.terraform.io/providers/hashicorp/aws/latest/docs
+    - https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/ami
 - https://www.terraform.io/
     - https://www.terraform.io/language/settings/backends
     - https://www.terraform.io/cli/commands/init
