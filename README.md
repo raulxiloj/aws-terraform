@@ -22,6 +22,10 @@ El ejemplo a continuacion consiste en crear un proyecto basado utilizando modulo
 - Se deben de utilizar variables (`.tfvars`) para parametrizar el proyecto
 - El proveedor a utilizar es AWS. 
 
+<p align="center">
+    <img src="https://user-images.githubusercontent.com/30850990/159194877-b752c768-6b5e-4428-ad58-111321d42b75.png"/>
+</p>
+
 ## Ejecucion
 Para poder probar el proyecto se tienen que ejecutar los siguientes comandos, esto se tiene que hacer posteriormente de haber configurado las credenciales de aws en su consola.
 
